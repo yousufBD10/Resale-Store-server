@@ -24,11 +24,18 @@ async function run(){
        //clirnt connect
        const ProductsCollection = client.db('ResaleStore').collection('ProductsData');
        const usersCollection = client.db('ResaleStore').collection('users');
+       const blogCollection = client.db('ResaleStore').collection('blogs');
 
          
        app.get('/categories', async (req,res)=>{
         const query = {}
-        const categories =await  ProductsCollection.find(query).toArray();;
+        const categories =await  ProductsCollection.find(query).toArray();
+       
+        res.send(categories);
+    });
+       app.get('/blog', async (req,res)=>{
+        const query = {}
+        const categories =await  blogCollection.find(query).toArray();
        
         res.send(categories);
     });
@@ -50,6 +57,16 @@ async function run(){
         const result = await usersCollection.insertOne(user);
         res.send(result); 
     });
+ 
+
+    app.get('/blog/:id', async (req,res)=>{
+        const id = req.params.id
+        const query = {_id:ObjectId(id)};
+        const singleBlog = await blogCollection.findOne(query);
+       
+        res.send(singleBlog);
+
+     });
 
     }
     catch{
