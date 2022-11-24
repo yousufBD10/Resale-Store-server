@@ -23,6 +23,7 @@ async function run(){
     try{
        //clirnt connect
        const ProductsCollection = client.db('ResaleStore').collection('ProductsData');
+       const usersCollection = client.db('ResaleStore').collection('users');
 
          
        app.get('/categories', async (req,res)=>{
@@ -31,7 +32,8 @@ async function run(){
        
         res.send(categories);
     });
-       app.get('/category/:brand', async (req,res)=>{
+
+       app.get('/:brand', async (req,res)=>{
         const brand = req.params.brand;
         const query = {
             brand:brand
@@ -39,6 +41,14 @@ async function run(){
         const categorie =await  ProductsCollection.find(query).toArray();;
        
         res.send(categorie);
+    });
+    
+    // save user to db
+    
+    app.post('/users',async(req,res)=>{
+        const user = req.body;
+        const result = await usersCollection.insertOne(user);
+        res.send(result); 
     });
 
     }
