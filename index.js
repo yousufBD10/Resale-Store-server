@@ -25,6 +25,7 @@ async function run(){
        const ProductsCollection = client.db('ResaleStore').collection('ProductsData');
        const usersCollection = client.db('ResaleStore').collection('users');
        const blogCollection = client.db('ResaleStore').collection('blogs');
+       const bookingCollection = client.db('ResaleStore').collection('booking');
 
          
        app.get('/categories', async (req,res)=>{
@@ -55,6 +56,14 @@ async function run(){
     app.post('/users',async(req,res)=>{
         const user = req.body;
         const result = await usersCollection.insertOne(user);
+        res.send(result); 
+    });
+
+
+    // booking data 
+    app.post('/booking',async(req,res)=>{
+        const booking = req.body;
+        const result = await bookingCollection.insertOne(booking);
         res.send(result); 
     });
  
