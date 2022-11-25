@@ -46,6 +46,7 @@ async function run() {
       const brand = req.params.brand;
       const query = {
         brand: brand,
+        // varified: true
       };
       const categorie = await ProductsCollection.find(query).toArray();
 
@@ -59,6 +60,32 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
+
+   
+
+    // sellers
+    app.get("/dashboard/:seller", async (req, res) => {
+        const seller = req.params.seller;
+        console.log(seller);
+        const query = {
+        role: seller,
+        };
+        const users = await usersCollection.find(query).toArray();
+  
+        res.send(users);
+      });
+   
+   /// all buyers
+      app.get("/dashboard/:buyer", async (req, res) => {
+        const buyer = req.params.buyer;
+        console.log(buyer);
+        const query = {
+        role: buyer,
+        };
+        const users = await usersCollection.find(query).toArray();
+  
+        res.send(users);
+      });
 
     // addmin
 
