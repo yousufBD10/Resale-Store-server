@@ -44,13 +44,28 @@ async function run() {
       const brand = req.params.brand;
       const query = {
         brand: brand,
-        // varified: true
+        isApproved: true
       };
       const categorie = await ProductsCollection.find(query).toArray();
 
       res.send(categorie);
     });
 
+
+
+    // approve post patch 
+    app.put('/dashboard/approvedrequest/:id', async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id : ObjectId(id)};
+      const options = {upsert: true};
+      const updateddoc = {
+          $set:{
+              isApproved: true
+          }
+      }
+      const result = await ProductsCollection.updateOne(filter,updateddoc,options);
+      res.send(result) ;
+    })
 
     //add products
 
@@ -66,7 +81,16 @@ async function run() {
       const email = req.query.email;
       const query = {email :email};
       const product = await ProductsCollection.find(query).toArray();
-      console.log(product);
+     
+      res.send(product);
+  });
+
+  // approved request
+    app.get('/dashboard/approvedpost', async (req,res)=>{
+    
+      const query = {isApproved :false};
+      const product = await ProductsCollection.find(query).toArray();
+     
       res.send(product);
   });
 
