@@ -53,7 +53,7 @@ async function run() {
 
 
 
-    // approve post patch 
+    // approve post put 
     app.put('/dashboard/approvedrequest/:id', async(req,res)=>{
       const id = req.params.id;
       const filter = {_id : ObjectId(id)};
@@ -66,6 +66,23 @@ async function run() {
       const result = await ProductsCollection.updateOne(filter,updateddoc,options);
       res.send(result) ;
     })
+
+
+    // sellers verified
+
+    app.put('/dashboard/users/admin/:id', async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id : ObjectId(id)};
+      const options = {upsert: true};
+      const updateddoc = {
+          $set:{
+              isVarified: true
+          }
+      }
+      const result = await usersCollection.updateOne(filter,updateddoc,options);
+      res.send(result) ;
+    })
+
 
     //add products
 
@@ -104,12 +121,19 @@ async function run() {
       res.send(result);
     });
 
-   
+
+    // get all user 
+
+    app.get("/allusers", async (req, res) => {
+      const query = {};
+      const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // sellers
     app.get("/dashboard/:seller", async (req, res) => {
         const seller = req.params.seller;
-        // console.log(seller);
+         console.log(seller);
         const query = {
         role: seller,
         };
