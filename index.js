@@ -22,9 +22,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     //clirnt connect
-    const ProductsCollection = client
-      .db("ResaleStore")
-      .collection("ProductsData");
+    const ProductsCollection = client.db("ResaleStore").collection("ProductsData");
     const usersCollection = client.db("ResaleStore").collection("users");
     const blogCollection = client.db("ResaleStore").collection("blogs");
     const bookingCollection = client.db("ResaleStore").collection("booking");
@@ -53,7 +51,28 @@ async function run() {
       res.send(categorie);
     });
 
-    // save user to db
+
+    //add products
+
+    app.post('/products',async(req,res)=>{
+      const product = req.body;
+      const result = await ProductsCollection.insertOne(product);
+      res.send(result);
+    })
+  
+       //my orders
+
+    app.get('/dashboard/myproducts', async (req,res)=>{
+      const email = req.query.email;
+      const query = {email :email};
+      const product = await ProductsCollection.find(query).toArray();
+      console.log(product);
+      res.send(product);
+  });
+
+
+
+    // save user to db   
 
     app.post("/users", async (req, res) => {
       const user = req.body;
@@ -66,7 +85,7 @@ async function run() {
     // sellers
     app.get("/dashboard/:seller", async (req, res) => {
         const seller = req.params.seller;
-        console.log(seller);
+        // console.log(seller);
         const query = {
         role: seller,
         };
@@ -78,7 +97,7 @@ async function run() {
    /// all buyers
       app.get("/dashboard/:buyer", async (req, res) => {
         const buyer = req.params.buyer;
-        console.log(buyer);
+        // console.log(buyer);
         const query = {
         role: buyer,
         };
@@ -99,7 +118,7 @@ async function run() {
     // sellers 
     app.get("/users/sellers/:email", async (req, res) => {
         const email = req.params.email;
-        console.log(email);
+        // console.log(email);
         const query = { email };
         const user = await usersCollection.findOne(query);
         res.send({ isSellers: user?.role === "seller" });
