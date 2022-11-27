@@ -68,6 +68,18 @@ async function run() {
     })
 
 
+
+
+    // delete sellers user 
+   
+    app.delete('/dashbord/seller/:user_uid', async (req,res)=>{
+      const id = req.params.user_uid;
+      const filter = {user_uid : id};
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result);
+
+    })
+
     // sellers verified
 
     app.put('/dashboard/users/admin/:id', async(req,res)=>{
