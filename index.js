@@ -76,9 +76,34 @@ async function run() {
       const id = req.params.user_uid;
       const filter = {user_uid : id};
       const result = await usersCollection.deleteOne(filter);
+     
       res.send(result);
 
     })
+
+    // delete sellers products
+    app.delete('/dashbord/product/:user_uid', async (req,res)=>{
+      const id = req.params.user_uid;
+      const filter = {user_uid : id};
+      const result = await ProductsCollection.deleteMany(filter);
+     
+      res.send(result);
+
+    })
+
+    // booking data 
+    app.get('/dashboard/bookings', async (req,res)=>{
+      const email = req.query.email;
+      // const decodedEmail = req.decoded.email;
+      // console.log(email,decodedEmail);
+      // if(email !== decodedEmail){
+      //     return res.status(403).send({message:'forbidden access'})
+      // }
+      const query = {email: email};
+      const bookings = await bookingCollection.find(query).toArray();
+      res.send(bookings);
+  });
+
 
     // sellers verified
 
