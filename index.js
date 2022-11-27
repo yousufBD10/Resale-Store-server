@@ -89,6 +89,17 @@ async function run() {
      
       res.send(result);
 
+    });
+
+    // delete my orders
+
+    app.delete('/dashboard/productsdelete/:id', async (req,res)=>{
+      const id = req.params.id;
+      const filter = {_id : ObjectId(id)};
+      const result = await ProductsCollection.deleteOne(filter);
+     
+      res.send(result);
+
     })
 
     // booking data 
@@ -109,7 +120,7 @@ async function run() {
 
     app.put('/dashboard/users/admin/:id', async(req,res)=>{
       const id = req.params.id;
-      const filter = {_id : ObjectId(id)};
+      const filter = {user_uid : id};
       const options = {upsert: true};
       const updateddoc = {
           $set:{
@@ -119,6 +130,47 @@ async function run() {
       const result = await usersCollection.updateOne(filter,updateddoc,options);
       res.send(result) ;
     })
+
+
+    // user vrified
+    app.put('/dashboard/userverified/admin/:id', async(req,res)=>{
+      const id = req.params.id;
+      const filter = {user_uid : id};
+      const options = {upsert: true};
+      const updateddoc = {
+          $set:{
+              isVarified: true
+          }
+      }
+      const result = await ProductsCollection.updateOne(filter,updateddoc,options);
+      res.send(result) ;
+    });
+
+    // Advertise products
+    app.put('/dashboard/advertise/:id', async(req,res)=>{
+      const id = req.params.id;
+      console.log(id);
+      const filter = {_id : ObjectId(id)};
+      const options = {upsert: true};
+      const updateddoc = {
+          $set:{
+              isAdvertise: true
+          }
+      }
+      const result = await ProductsCollection.updateOne(filter,updateddoc,options);
+      res.send(result) ;
+    });
+
+    // get advertise
+    app.get('/alladvertise',(req,res)=>{
+     
+     
+      const query= {};
+      const advertise = ProductsCollection.find(query).toArray();
+      res.send(advertise)
+    });
+
+
 
 
     //add products
