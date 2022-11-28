@@ -27,12 +27,17 @@ async function run() {
     const blogCollection = client.db("ResaleStore").collection("blogs");
     const bookingCollection = client.db("ResaleStore").collection("booking");
 
-    app.get("/categories", async (req, res) => {
-      const query = {};
+
+
+    app.get("/alladvertise", async (req, res) => {
+      const query = { payment_status: "available"};
       const categories = await ProductsCollection.find(query).toArray();
 
       res.send(categories);
     });
+
+
+
     app.get("/blog", async (req, res) => {
       const query = {};
       const categories = await blogCollection.find(query).toArray();
@@ -154,7 +159,7 @@ async function run() {
       const options = {upsert: true};
       const updateddoc = {
           $set:{
-              isAdvertise: true
+            payment_status: 'available'
           }
       }
       const result = await ProductsCollection.updateOne(filter,updateddoc,options);
@@ -162,13 +167,14 @@ async function run() {
     });
 
     // get advertise
-    app.get('/alladvertise',(req,res)=>{
+    // app.get('/alladvertise',async(req,res)=>{
      
      
-      const query= {};
-      const advertise = ProductsCollection.find(query).toArray();
-      res.send(advertise)
-    });
+    //   const query= {};
+    //   const cursor =await ProductsCollection.find(query).toArray();
+    //   console.log(query);
+    //   res.send(cursor)
+    // });
 
 
 
