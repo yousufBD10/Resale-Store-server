@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { default: Stripe } = require("stripe");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 require("dotenv").config();
 
@@ -28,12 +30,32 @@ async function run() {
     const bookingCollection = client.db("ResaleStore").collection("booking");
 
 
-
+// get all advertised
     app.get("/alladvertise", async (req, res) => {
-      const query = { payment_status: "available"};
+      const query = { payment_status: true};
       const categories = await ProductsCollection.find(query).toArray();
 
       res.send(categories);
+    });
+
+
+    // payment data 
+
+    // app.get("/payment/:booking_id", async (req, res) => {
+    //   const id = req.params.booking_id;
+    //   const query = { _id: id};
+    //   const categories = await ProductsCollection.find(query).toArray();
+
+    //   res.send(categories);
+    // });
+    app.get("/myorders/payments/:booking_id", async (req, res) => {
+      const booking_id = req.params.booking_id
+      const query = { _id: ObjectId(booking_id)};
+      // console.log(booking_id);
+      const cursor = await ProductsCollection.findOne(query);
+      // const rsult =  toArray(cursor);
+
+      res.send(cursor);
     });
 
 
@@ -81,6 +103,28 @@ async function run() {
       const id = req.params.user_uid;
       const filter = {user_uid : id};
       const result = await usersCollection.deleteOne(filter);
+     
+      res.send(result);
+
+    });
+
+    //delete buyer 
+    app.delete('/dashbord/buyer/:id', async (req,res)=>{
+      const id = req.params.id;
+      const filter = {_id : ObjectId(id)};
+      const result = await usersCollection.deleteOne(filter);
+     
+      res.send(result);
+
+    });
+
+
+
+    // my oders delete 
+    app.delete('/dashboard/myorderdelete/:id', async (req,res)=>{
+      const id = req.params.id;
+      const query = {_id : ObjectId(id)};
+      const result = await bookingCollection.deleteOne(query);
      
       res.send(result);
 
@@ -154,17 +198,43 @@ async function run() {
     // Advertise products
     app.put('/dashboard/advertise/:id', async(req,res)=>{
       const id = req.params.id;
-      console.log(id);
+      // console.log(id);
       const filter = {_id : ObjectId(id)};
       const options = {upsert: true};
       const updateddoc = {
           $set:{
-            payment_status: 'available'
+            payment_status: true,
+            advertiseBtn : true
           }
       }
       const result = await ProductsCollection.updateOne(filter,updateddoc,options);
       res.send(result) ;
     });
+
+    // add to reported
+    app.put('/dashboard/reported/:id', async(req,res)=>{
+      const id = req.params.id;
+      // console.log(id);
+      const filter = {_id : ObjectId(id)};
+      const options = {upsert: true};
+      const updateddoc = {
+          $set:{
+            reported: true,
+          
+          }
+      }
+      const result = await ProductsCollection.updateOne(filter,updateddoc,options);
+      res.send(result) ;
+    }); 
+
+    // get wishlist
+
+    app.get('/dashboard/reported/', async (req,res)=>{
+     
+      const query = {reported: true};
+      const report = await ProductsCollection.find(query).toArray();
+      res.send(report);
+  });
 
     // get advertise
     // app.get('/alladvertise',async(req,res)=>{
@@ -228,7 +298,7 @@ async function run() {
     // sellers
     app.get("/dashboard/:seller", async (req, res) => {
         const seller = req.params.seller;
-         console.log(seller);
+        //  console.log(seller);
         const query = {
         role: seller,
         };
@@ -290,6 +360,43 @@ async function run() {
 
       res.send(singleBlog);
     });
+
+    // app.post('/totalpayment/payments',async(req,res)=>{
+    //   const booking =  req.body;
+    //   const price = booking.price;
+    //   const amount = price*100;
+    //   const paymentIntent = await  Stripe.paymentIntent.create({
+    //     currency: 'usd',
+    //     amount : amount,
+    //     "payment_method_tipes":[
+    //       "card"
+    //     ]
+
+    //   });
+    //   res.send({
+    //     clientSecret: paymentIntent.client_secret,
+    //   })
+    // });
+
+    app.post('/create-payment-intent', async (req, res) => {
+      const booking = req.body;
+      const price = booking.price;
+      const amount = price * 100;
+
+      const paymentIntent = await stripe.paymentIntents.create({
+          currency: 'usd',
+          amount: amount,
+          "payment_method_types": [
+              "card"
+          ]
+      });
+      res.send({
+          clientSecret: paymentIntent.client_secret,
+      });
+  });
+
+    
+
   } catch {
     console.error(error);
   }
