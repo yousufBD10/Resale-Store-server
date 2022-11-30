@@ -226,6 +226,20 @@ async function run() {
       const result = await ProductsCollection.updateOne(filter,updateddoc,options);
       res.send(result) ;
     }); 
+    app.put('/reportdelete/:id', async(req,res)=>{
+      const id = req.params.id;
+      console.log(id);
+      const filter = {_id : ObjectId(id)};
+      const options = {upsert: true};
+      const updateddoc = {
+          $set:{
+            reported: false,
+          
+          }
+      }
+      const result = await ProductsCollection.updateOne(filter,updateddoc,options);
+      res.send(result) ;
+    }); 
 
     // get wishlist
 
@@ -338,11 +352,14 @@ async function run() {
       });
 
         // buyers 
-    app.get("/users/buyers/:email", async (req, res) => {
+    app.get("/buyer/:email", async (req, res) => {
         const email = req.params.email;
+        console.log(email);
       
         const query = { email };
+        
         const user = await usersCollection.findOne(query);
+        console.log(user);
         res.send({ isBuyers: user?.role === "buyer" });
       });
 
